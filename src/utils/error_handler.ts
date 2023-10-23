@@ -8,7 +8,7 @@ const uncaught_exception_error = () => {
     });
 
     process.on('unhandledRejection', (ex: globalThis.Error) => {
-        winston_logger.error('unhandled rejection found', ex.stack);
+        winston_logger.error('unhandled rejection found', ex);
         winston_exceptions.error(ex.message, ex);
         process.exit(1);
     })
