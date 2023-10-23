@@ -6,8 +6,8 @@ CREATE TABLE user_table (
     password VARCHAR(255) NOT NULL,
     name VARCHAR(60) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    token VARCHAR(255) NOT NULL,
-    refresh_token VARCHAR(255) NOT NULL,
+    token VARCHAR(1000) NOT NULL,
+    refreshed_token VARCHAR(1000) NOT NULL,
     created_on timestamp default CURRENT_TIMESTAMP not null,
     updated_on timestamp default CURRENT_TIMESTAMP not null
 );
