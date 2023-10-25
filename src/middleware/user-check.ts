@@ -14,15 +14,17 @@ const decode_jwt = async (req: Request, res: Response, next: NextFunction) => {
 
     if (!token) return res.status(400).json({ message: 'token not found' })
 
-    if (!refreshToken) return res.status(400).json({ message: 'token not found' })
+    if (!refreshToken) return res.status(400).json({ message: 'refreshed token not found' })
 
 
 
     const { expired, message, decoded } = await readJwt(token);
     const { expired: expRef, message: mesRef, decoded: decRef } = await readJwt(refreshToken);
+
     const { name, email, user_id } = decRef as decodedData;
 
     if (expired && !expRef) {
+        console.log('i got here line 27');
 
         const { editedData, error } = await regenerate_token({ name, email, user_id })
         if (error) return res.status(400).json({ message: error.message })
@@ -32,13 +34,19 @@ const decode_jwt = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     if (expired && expRef) {
+        console.log('i got here line 37');
 
-        res.locals.user = {}
-        return res.json({ message });
+        const resMessage = message | mesRef
+        res.locals.user = {};
+        return res.json({ resMessage });
     }
 
-    res.locals.user = decoded;
-    return next();
+    if (!expired && !expRef) {
+        console.log('i got here line 44');
+        res.locals.user = decoded;
+        return next();
+    }
+
 
 }
 

@@ -14,20 +14,4 @@ const checkEmailExist = async (email: string) => {
     }
 };
 
-
-// const deleteUserAccountService = async (user_id: string) => {
-//     try {
-//         if (!user_id) throw new Error('ID not valid')
-
-//         const { rowCount } = await pool_dev.query(DELETE_USER_ACCOUNT, [user_id])
-//         console.log('user_delete', rowCount);
-
-//         return { rowCount }
-//     }
-//     catch (error: any) {
-//         winston_logger.error(error.message, error);
-//         return { error }
-//     }
-// }
-
 export { checkEmailExist }

@@ -1,24 +1,28 @@
-import { userRegData, userLogin } from "../types/types.user";
+import { decodedData, resetPasswordInterface } from './../types/types.user';
+import { userRegData, userLogin, forgotPassword } from "../types/types.user";
 import hash_password from "../utils/hash-password";
 import pool_dev from "../database/db";
 import { winston_logger } from "../utils/logger";
-import { REGISTER_USER, LOGIN_USER, EDIT_USER, REFRESH_TOKEN, DELETE_USER_ACCOUNT } from '../database/queries'
+import { REGISTER_USER, LOGIN_USER, EDIT_USER, REFRESH_TOKEN, DELETE_USER_ACCOUNT, GET_ALL_VISITORS, CHECK_EMAIL_EXIST, REQUEST_RESET_PASSWORD, CHECK_RESET_EMAIL_EXIST, UPDATE_RESET_PASSWORD, RESET_PASSWORD, DELETE_RESET_PASSWORD } from '../database/queries'
 import { checkEmailExist } from "../utils/check-email-exist";
 import comparePassword from "../utils/compare-password";
 import { customAlphabet } from 'nanoid';
 import config from 'config';
-import { writeJwt } from "../middleware/jwt-encryption";
-import { decodedData } from '../types/types.user';
+import { readJwt, writeJwt } from "../middleware/jwt-encryption";
+import _ from "lodash";
+import { sendForgotPasswordEmail } from "../utils/nodemailer";
+import { JwtPayload } from 'jsonwebtoken';
 
 
 const createUserService = async (body: userRegData) => {
     const nanoid = customAlphabet(config.get('customNanoID'), 20)
     const user_id = `user_id${nanoid()}`
-    const token = await writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('tokenTTL') });
-    const refreshed_token = await writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('refreshedTokenTTL') });
+    const token = writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('tokenTTL') });
+    const refreshed_token = writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('refreshedTokenTTL') });
 
     try {
-        const new_password: string | undefined = await hash_password(body.password);
+        const { new_password, error } = await hash_password(body.password);
+        if (error) throw new Error('could not hash the password')
         const password = new_password;
         const { name, email, } = body;
         const result = await checkEmailExist(email);
@@ -97,5 +101,64 @@ const deleteUserAccountService = async (user_id: string) => {
         winston_logger.error(error.message, error);
         return { error }
     }
+};
+
+const getAllVisitorsService = async () => {
+    try {
+        const { rows: data } = await pool_dev.query(GET_ALL_VISITORS);
+
+        return { data }
+    }
+    catch (error: any) {
+        winston_logger.error(error.message, error)
+        return { error }
+    }
+};
+
+
+const forgotPasswordService = async (decoded: decodedData) => {
+    try {
+        const data = _.omit(decoded, ['iat', 'exp', 'token', 'refreshed_token']);
+
+        const resetPasswordToken = writeJwt({ ...data }, { expiresIn: config.get<string>('resetPasswordTokenTTL') });
+        const { rows: respRows } = await pool_dev.query(CHECK_RESET_EMAIL_EXIST, [data.email]);
+        if (respRows.length) {
+            const { rows } = await pool_dev.query(UPDATE_RESET_PASSWORD, [data.email, resetPasswordToken]);
+            const respData: forgotPassword = rows[0];
+            await sendForgotPasswordEmail(respData);
+            return { respData };
+        } else {
+            const { rows } = await pool_dev.query(REQUEST_RESET_PASSWORD, [data.email, resetPasswordToken]);
+
+            const respData: forgotPassword = rows[0];
+            await sendForgotPasswordEmail(respData);
+
+            return { respData };
+        }
+    }
+    catch (error: any) {
+        winston_logger.error(error.message, error);
+        return { error };
+    }
+};
+
+const resetPasswordService = async (password: string, decoded: decodedData) => {
+
+    try {
+        const { error, new_password } = await hash_password(password);
+
+        if (error) throw new Error('could not hash the password');
+
+        const { rows } = await pool_dev.query(RESET_PASSWORD, [new_password, decoded?.email]);
+        const data = rows[0];
+
+        const { rowCount } = await pool_dev.query(DELETE_RESET_PASSWORD, [decoded.email])
+        return { data, rowCount }
+    }
+    catch (error: any) {
+        winston_logger.error(error.message, error);
+        return { error }
+    }
 }
-export { createUserService, loginUserServices, editUserService, deleteUserAccountService }
+
+export { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService }

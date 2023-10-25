@@ -1,3 +1,4 @@
+
 export { createUserInputType, loginUserInputType, editUserInputType as editUser } from './../zod-schema/zod.user.schema';
 
 export interface userRegData {
@@ -31,4 +32,17 @@ export interface mailOptions {
 export interface emailUrlAndName {
     name: string;
     url: string;
+};
+
+export interface forgotPassword {
+    serial: number;
+    reset_token: string;
+    email: string;
+}
+
+
+export interface resetPasswordInterface {
+    decoded: decodedData;
+    message: string;
+    expired: boolean;
 }
