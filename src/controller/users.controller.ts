@@ -1,10 +1,10 @@
 import { Response, Request } from "express";
-import { createUserService, loginUserServices, editUserService, deleteUserAccountService } from "../services/users.services";
-import { userRegData, userLogin, editUser, decodedData } from "../types/types.user";
+import { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService } from "../services/users.services";
+import { userRegData, userLogin, decodedData } from "../types/types.user";
 import _ from "lodash";
-import { editUserInputType } from "../zod-schema/zod.user.schema";
 import { sendEmail } from "../utils/nodemailer";
-
+import { readJwt } from "../middleware/jwt-encryption";
+import { JwtPayload } from "jsonwebtoken";
 
 
 const createUser = async (req: Request<{}, {}, userRegData>, res: Response) => {
@@ -64,8 +64,43 @@ const deleteUserAccount = async (req: Request, res: Response) => {
         return res.status(400).json({ message: 'user not found', status: 'failed', data: {} });
 
     }
+};
 
+const getAllVisitors = async (req: Request, res: Response) => {
+    const { data, error } = await getAllVisitorsService();
+    if (error) {
+        return res.status(400).json({ data: {}, message: error.message, status: 'failed' })
+    }
+    return res.status(200).json({ data, message: 'all users fetched successfully', status: 'success' });
 
 };
 
-export { createUser, loginUser, editUserDetails, deleteUserAccount } 
+const forgotPassword = async (req: Request, res: Response) => {
+    const decoded: decodedData = res.locals.user;
+    const { email } = req.body;
+    if (decoded.email === email) {
+
+        const { respData: data, error } = await forgotPasswordService(decoded);
+        if (error) return res.status(400).json({ data: {}, message: error.message, status: 'failed' });
+
+        return res.status(200).json({ data, message: 'reset string sent to your email', status: 'success' });
+    } else {
+        return res.status(400).json({ message: 're-login and submit a correct email', status: 'failed' });
+    }
+};
+
+
+const resetPassword = async (req: Request, res: Response) => {
+    const { resetToken } = req.params;
+    const { password } = req.body;
+    const { decoded, message, expired } = await readJwt(resetToken) as JwtPayload;
+
+    if (expired) return res.status(401).json({ message, status: 'failed' });
+
+    const { data, rowCount } = await resetPasswordService(password, decoded);
+
+    if (data && rowCount) return res.status(200).json({ message: 'successful - Login with your new password', status: 'success' })
+    return res.status(401).json({ message: 'nothing to reset', status: 'failed' });
+};
+
+export { createUser, loginUser, editUserDetails, deleteUserAccount, getAllVisitors, forgotPassword, resetPassword } 

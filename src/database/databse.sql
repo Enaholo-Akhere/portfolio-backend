@@ -12,6 +12,13 @@ CREATE TABLE user_table (
     updated_on timestamp default CURRENT_TIMESTAMP not null
 );
 
+CREATE TABLE user_reset_password (
+    serial SERIAL PRIMARY KEY,
+    reset_token VARCHAR(1000) NOT NULL,
+    email VARCHAR(100) NOT NULL
+);
+
+
 -- TRIGGER and PROCEDURE functions
 CREATE  FUNCTION update_updated_on_user_task()
 RETURNS TRIGGER AS $$

@@ -1,3 +1,4 @@
+import { decodedData } from './../types/types.user';
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from 'config';
 import { winston_logger } from "../utils/logger";
@@ -6,8 +7,8 @@ import { winston_logger } from "../utils/logger";
 const privateKey = config.get<string>('private_key');
 const publicKey = config.get<string>('public_key');
 
-const writeJwt = async (object: Object, options?: jwt.SignOptions | undefined) => {
-    const jwtSign = await jwt.sign(object, privateKey, {
+const writeJwt = (object: Object, options?: jwt.SignOptions | undefined) => {
+    const jwtSign = jwt.sign(object, privateKey, {
         ...(options && options),
         algorithm: 'RS256',
     });
@@ -27,7 +28,7 @@ const readJwt = async (token: string) => {
         }
     }
     catch (error: any) {
-        winston_logger.error(error.message, error.stack);
+        winston_logger.error(error.message, error);
         return {
             decoded: {},
             expired: error.message === 'jwt expired',
