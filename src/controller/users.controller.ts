@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService } from "../services/users.services";
+import { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService } from "../services/users.services";
 import { userRegData, userLogin, decodedData } from "../types/types.user";
 import _ from "lodash";
 import { sendEmail } from "../utils/nodemailer";
@@ -18,6 +18,13 @@ const createUser = async (req: Request<{}, {}, userRegData>, res: Response) => {
     return res.json({ data, message: 'user registered successfully', status: 'success' });
 };
 
+const googleSignup = async (req: Request, res: Response) => {
+    const body: userRegData = req.body;
+    const { data, error } = await googleSignupService(body);
+    return res.status(200).json({ message: 'created successfully', data })
+};
+
+
 const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) => {
     const loginDetails: userLogin = req.body;
 
@@ -29,8 +36,8 @@ const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) => {
 
         return res.json({ data: userData, message: 'success' });
     }
-
 };
+
 
 const editUserDetails = async (req: Request, res: Response) => {
     const { userID: user_id } = req.params;
@@ -47,6 +54,7 @@ const editUserDetails = async (req: Request, res: Response) => {
         return res.status(400).json({ data: {}, message: 'invalid user_ID provided', status: 'failed' })
     }
 };
+
 
 const deleteUserAccount = async (req: Request, res: Response) => {
     const { userID } = req.params;
@@ -66,6 +74,7 @@ const deleteUserAccount = async (req: Request, res: Response) => {
     }
 };
 
+
 const getAllVisitors = async (req: Request, res: Response) => {
     const { data, error } = await getAllVisitorsService();
     if (error) {
@@ -74,6 +83,7 @@ const getAllVisitors = async (req: Request, res: Response) => {
     return res.status(200).json({ data, message: 'all users fetched successfully', status: 'success' });
 
 };
+
 
 const forgotPassword = async (req: Request, res: Response) => {
     const decoded: decodedData = res.locals.user;
@@ -103,4 +113,14 @@ const resetPassword = async (req: Request, res: Response) => {
     return res.status(401).json({ message: 'nothing to reset', status: 'failed' });
 };
 
-export { createUser, loginUser, editUserDetails, deleteUserAccount, getAllVisitors, forgotPassword, resetPassword } 
+type token = string
+const logoutUser = async (req: Request, res: Response) => {
+    const decoded: decodedData = res.locals.user;
+
+    const { message, error } = await logoutService(decoded);
+    if (error) return res.status(404).json({ message: error.message, status: 'failed', data: {} })
+
+    return res.status(200).json({ message, status: 'success', data: {} });
+};
+
+export { createUser, loginUser, editUserDetails, deleteUserAccount, getAllVisitors, forgotPassword, resetPassword, googleSignup, logoutUser } 
