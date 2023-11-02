@@ -12,6 +12,7 @@ import { readJwt, writeJwt } from "../middleware/jwt-encryption";
 import _ from "lodash";
 import { sendForgotPasswordEmail } from "../utils/nodemailer";
 import { JwtPayload } from 'jsonwebtoken';
+import generator from 'generate-password';
 
 
 const createUserService = async (body: userRegData) => {
@@ -39,8 +40,24 @@ const createUserService = async (body: userRegData) => {
         winston_logger.error(error.message, error.stack);
         return { error }
     }
-
 }
+
+const googleSignupService = async (body: userRegData) => {
+    const nanoid = customAlphabet(config.get('customNanoID'), 20);
+    const user_id = `user_id${nanoid()}`
+    const token = writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('tokenTTL') });
+    const refreshed_token = writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('refreshedTokenTTL') });
+    const password = generator.generate({
+        length: 10,
+        numbers: true
+    });
+    console.log('generated password', password);
+    const error = '1234';
+    const data = body;
+    return { error, data }
+
+};
+
 
 const loginUserServices = async (loginDetails: userLogin) => {
     const { email, password } = loginDetails;
@@ -158,7 +175,28 @@ const resetPasswordService = async (password: string, decoded: decodedData) => {
     catch (error: any) {
         winston_logger.error(error.message, error);
         return { error }
-    }
-}
+    };
+};
 
-export { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService }
+
+const logoutService = async (decoded: decodedData) => {
+
+    console.log('decoded', decoded.user_id);
+
+    const token = writeJwt({}, { expiresIn: config.get<string>('logoutTTL') });
+    const refreshed_token = writeJwt({}, { expiresIn: config.get<string>('logoutTTL') });
+
+    try {
+        await pool_dev.query(REFRESH_TOKEN, [token, refreshed_token, decoded.user_id]);
+
+        const message = 'logged out successfully'
+        return { message }
+    }
+    catch (error: any) {
+        winston_logger.error(error.message, error);
+        return { error }
+    }
+};
+
+
+export { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService }
