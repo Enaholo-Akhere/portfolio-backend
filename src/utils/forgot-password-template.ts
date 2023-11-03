@@ -1,6 +1,10 @@
 import { decodedData, forgotPassword } from "../types/types.user";
+import config from 'config'
 
 export const forgotPasswordTemplate = (data: forgotPassword) => {
+    const url_dev = config.get<string>('URL_DEV');
+    const url_prod = config.get<string>('URL_PROD')
+    const baseUrl = process.env.NODE_ENV === 'production' ? url_prod : url_dev;
 
     const resetPassword: string = `<!DOCTYPE html>
 <html>
@@ -22,12 +26,12 @@ export const forgotPasswordTemplate = (data: forgotPassword) => {
                             <p>Hello,</p>
                             <p>You have requested a password reset for your account. To reset your password, click the button below:</p>
                             <p style="text-align: center;">
-                                <a href="http:localhost:3000/${data.reset_token}" style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 3px;">Reset Password</a>
+                                <a href="${baseUrl}/?token=${data.reset_token}&tm=Xbgs1Q" style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 3px;">Reset Password</a>
                             </p>
                             <p>If you didn't request this reset, please ignore this email; your password won't be changed.</p>
                           
                             <p>This link will expire in exactly <b>30 minutes</b> from now.</p>
-                            <p>Thank you,</p>
+                          <p>Thank you,</p>
                         </td>
                     </tr>
                      <tr>
