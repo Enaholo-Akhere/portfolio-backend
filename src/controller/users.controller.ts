@@ -90,10 +90,10 @@ const forgotPassword = async (req: Request, res: Response) => {
     const { email } = req.body;
     if (decoded.email === email) {
 
-        const { respData: data, error } = await forgotPasswordService(decoded);
+        const { respData, error } = await forgotPasswordService(decoded);
         if (error) return res.status(400).json({ data: {}, message: error.message, status: 'failed' });
 
-        return res.status(200).json({ data, message: 'reset string sent to your email', status: 'success' });
+        return res.status(200).json({ message: 'reset string sent to your email', status: 'success' });
     } else {
         return res.status(400).json({ message: 're-login and submit a correct email', status: 'failed' });
     }
