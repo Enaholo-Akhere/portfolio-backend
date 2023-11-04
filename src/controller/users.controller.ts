@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService } from "../services/users.services";
+import { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService } from "../services/users.services";
 import { userRegData, userLogin, decodedData } from "../types/types.user";
 import _ from "lodash";
 import { sendEmail } from "../utils/nodemailer";
@@ -60,7 +60,6 @@ const deleteUserAccount = async (req: Request, res: Response) => {
     const { userID } = req.params;
     const { user_id } = res.locals.user as decodedData;
 
-
     if (userID === user_id) {
         const { error, rowCount } = await deleteUserAccountService(userID)
         if (error || !rowCount) {
@@ -86,17 +85,13 @@ const getAllVisitors = async (req: Request, res: Response) => {
 
 
 const forgotPassword = async (req: Request, res: Response) => {
-    const decoded: decodedData = res.locals.user;
+
     const { email } = req.body;
-    if (decoded.email === email) {
+    const { respData, error } = await forgotPasswordService(email);
+    if (error) return res.status(400).json({ message: error.message, status: 'failed' });
 
-        const { respData, error } = await forgotPasswordService(decoded);
-        if (error) return res.status(400).json({ data: {}, message: error.message, status: 'failed' });
+    if (respData) return res.status(200).json({ message: 'reset string sent to your email', status: 'success' });
 
-        return res.status(200).json({ message: 'reset string sent to your email', status: 'success' });
-    } else {
-        return res.status(400).json({ message: 're-login and submit a correct email', status: 'failed' });
-    }
 };
 
 
@@ -107,7 +102,9 @@ const resetPassword = async (req: Request, res: Response) => {
 
     if (expired) return res.status(401).json({ message, status: 'failed' });
 
-    const { data, rowCount } = await resetPasswordService(password, decoded);
+    const { data, rowCount, error } = await resetPasswordService(password, decoded);
+
+    if (error) return res.status(401).json({ message: error.message, status: 'failed' });
 
     if (data && rowCount) return res.status(200).json({ message: 'successful - Login with your new password', status: 'success' })
     return res.status(401).json({ message: 'nothing to reset', status: 'failed' });
@@ -123,4 +120,16 @@ const logoutUser = async (req: Request, res: Response) => {
     return res.status(200).json({ message, status: 'success', data: {} });
 };
 
-export { createUser, loginUser, editUserDetails, deleteUserAccount, getAllVisitors, forgotPassword, resetPassword, googleSignup, logoutUser } 
+
+const downloadResume = async (req: Request, res: Response) => {
+    const decoded: decodedData = res.locals.user;
+
+    if (Object.keys(decoded).length) {
+        downloadResumeService(req, res)
+    } else {
+        res.status(401).json({ message: 'you have to first login', status: 'failed' })
+    }
+};
+
+
+export { createUser, loginUser, editUserDetails, deleteUserAccount, getAllVisitors, forgotPassword, resetPassword, googleSignup, logoutUser, downloadResume } 

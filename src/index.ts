@@ -4,6 +4,9 @@ import uncaught_exception_error from './utils/error_handler';
 import userRoute from '../src/routes/user.routers'
 import cors from 'cors';
 
+import path from 'path';
+import fs from 'fs';
+
 
 const app = express();
 const PORT = config.get<number>('PORT');
@@ -21,6 +24,21 @@ app.use(express.urlencoded({ extended: true }))
 app.get(`/${ver}/user`, (req, res) => {
     res.send('hello world')
 })
+
+
+app.get('/download', function (req, res) {
+
+    const file = __dirname + '/upload-folder/Resume-Enaholo-Akhere.pdf';
+
+    const filename = path.basename(file);
+
+    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+
+    const filestream = fs.createReadStream(file);
+    filestream.pipe(res);
+});
+
+
 app.use(`/${ver}/user`, userRoute);
 
 //server start up

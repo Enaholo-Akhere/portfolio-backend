@@ -13,6 +13,9 @@ import _ from "lodash";
 import { sendForgotPasswordEmail } from "../utils/nodemailer";
 import { JwtPayload } from 'jsonwebtoken';
 import generator from 'generate-password';
+import path from 'path';
+import fs from 'fs';
+
 
 
 const createUserService = async (body: userRegData) => {
@@ -76,11 +79,11 @@ const loginUserServices = async (loginDetails: userLogin) => {
 
                 return { data: login_data?.rows[0] };
             } else {
-                throw new Error('Username or password incorrect');
+                throw new Error(' Incorrect Username or password');
             }
 
         } else {
-            throw new Error('Username or password incorrect');
+            throw new Error('Incorrect Username or password');
         }
     }
     catch (error: any) {
@@ -133,19 +136,25 @@ const getAllVisitorsService = async () => {
 };
 
 
-const forgotPasswordService = async (decoded: decodedData) => {
+const forgotPasswordService = async (email: string) => {
     try {
-        const data = _.omit(decoded, ['iat', 'exp', 'token', 'refreshed_token']);
 
-        const resetPasswordToken = writeJwt({ ...data }, { expiresIn: config.get<string>('resetPasswordTokenTTL') });
-        const { rows: respRows } = await pool_dev.query(CHECK_RESET_EMAIL_EXIST, [data.email]);
+        const resetPasswordToken = writeJwt({ email }, { expiresIn: config.get<string>('resetPasswordTokenTTL') });
+        const { rows: emailExist } = await pool_dev.query(CHECK_EMAIL_EXIST, [email]);
+        if (!emailExist.length) throw new Error('email does not exist');
+
+        const { rows: respRows } = await pool_dev.query(CHECK_RESET_EMAIL_EXIST, [email]);
+        console.log('rep role', respRows);
+
         if (respRows.length) {
-            const { rows } = await pool_dev.query(UPDATE_RESET_PASSWORD, [data.email, resetPasswordToken]);
+            const { rows } = await pool_dev.query(UPDATE_RESET_PASSWORD, [email, resetPasswordToken]);
             const respData: forgotPassword = rows[0];
+
+
             await sendForgotPasswordEmail(respData);
             return { respData };
         } else {
-            const { rows } = await pool_dev.query(REQUEST_RESET_PASSWORD, [data.email, resetPasswordToken]);
+            const { rows } = await pool_dev.query(REQUEST_RESET_PASSWORD, [email, resetPasswordToken]);
 
             const respData: forgotPassword = rows[0];
             await sendForgotPasswordEmail(respData);
@@ -198,5 +207,17 @@ const logoutService = async (decoded: decodedData) => {
     }
 };
 
+const downloadResumeService = async (req: any, res: any) => {
 
-export { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService }
+    const file = __dirname + '/upload-folder/Resume-Enaholo-Akhere.pdf';
+
+    const filename = path.basename(file);
+
+    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+
+    const filestream = fs.createReadStream(file);
+    filestream.pipe(res);
+
+};
+
+export { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService }
