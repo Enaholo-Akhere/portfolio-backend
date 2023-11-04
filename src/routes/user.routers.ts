@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { createUser, deleteUserAccount, editUserDetails, forgotPassword, getAllVisitors, googleSignup, loginUser, logoutUser, resetPassword } from '../controller/users.controller';
+import { createUser, deleteUserAccount, downloadResume, editUserDetails, forgotPassword, getAllVisitors, googleSignup, loginUser, logoutUser, resetPassword } from '../controller/users.controller';
 import validate from '../DTO_validations/zod-validate';
 import { createUserSchema, editPasswordSchema, emailUserSchema, googleSignupUserSchema, loginUserSchema, userIDSchema, } from '../zod-schema/zod.user.schema';
 import { decode_jwt } from '../middleware/user-check';
@@ -19,11 +19,14 @@ router.put('/edit/:userID', [decode_jwt, validate(userIDSchema)], editUserDetail
 
 router.delete('/delete-user-account/:userID', [decode_jwt, validate(userIDSchema)], deleteUserAccount);
 
-router.post('/request-reset-password', [decode_jwt, validate(emailUserSchema)], forgotPassword);
+router.post('/request-reset-password', validate(emailUserSchema), forgotPassword);
 
-router.post('/set-new-password/:resetToken', [decode_jwt, validate(editPasswordSchema)], resetPassword);
+router.post('/set-new-password/:resetToken', validate(editPasswordSchema), resetPassword);
 
 router.put('/logout', decode_jwt, logoutUser);
+
+router.get('/download-resume', decode_jwt, downloadResume);
+
 
 
 export default router;
