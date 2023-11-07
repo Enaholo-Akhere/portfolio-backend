@@ -1,9 +1,9 @@
-import { decodedData, resetPasswordInterface } from './../types/types.user';
+import { decodedData, messageMeInterface, resetPasswordInterface } from './../types/types.user';
 import { userRegData, userLogin, forgotPassword } from "../types/types.user";
 import hash_password from "../utils/hash-password";
 import pool_dev from "../database/db";
 import { winston_logger } from "../utils/logger";
-import { REGISTER_USER, LOGIN_USER, EDIT_USER, REFRESH_TOKEN, DELETE_USER_ACCOUNT, GET_ALL_VISITORS, CHECK_EMAIL_EXIST, REQUEST_RESET_PASSWORD, CHECK_RESET_EMAIL_EXIST, UPDATE_RESET_PASSWORD, RESET_PASSWORD, DELETE_RESET_PASSWORD } from '../database/queries'
+import { REGISTER_USER, LOGIN_USER, EDIT_USER, REFRESH_TOKEN, DELETE_USER_ACCOUNT, GET_ALL_VISITORS, CHECK_EMAIL_EXIST, REQUEST_RESET_PASSWORD, CHECK_RESET_EMAIL_EXIST, UPDATE_RESET_PASSWORD, RESET_PASSWORD, DELETE_RESET_PASSWORD, SEND_MESSAGE } from '../database/queries'
 import { checkEmailExist } from "../utils/check-email-exist";
 import comparePassword from "../utils/compare-password";
 import { customAlphabet } from 'nanoid';
@@ -220,4 +220,17 @@ const downloadResumeService = async (req: any, res: any) => {
 
 };
 
-export { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService }
+const messageMeService = async (messageMeService: messageMeInterface) => {
+    const { email, name, message } = messageMeService;
+    try {
+        const { rows } = await pool_dev.query(SEND_MESSAGE, [email, name, message]);
+        const data = rows[0];
+        return { data }
+    }
+    catch (error: any) {
+        winston_logger.error(error.message, error);
+        return { error }
+    }
+};
+
+export { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService, messageMeService }

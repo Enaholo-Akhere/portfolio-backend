@@ -46,3 +46,9 @@ export interface resetPasswordInterface {
     message: string;
     expired: boolean;
 }
+
+export interface messageMeInterface {
+    email: string;
+    name: string;
+    message: string;
+}

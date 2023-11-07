@@ -36,9 +36,9 @@ const decode_jwt = async (req: Request, res: Response, next: NextFunction) => {
     if (expired && expRef) {
         console.log('i got here line 37');
 
-        const resMessage = message | mesRef
+        const resMessage = message || mesRef
         res.locals.user = {};
-        return res.json({ resMessage });
+        return res.status(400).json({ message: resMessage, });
     }
 
     if (!expired && !expRef) {
