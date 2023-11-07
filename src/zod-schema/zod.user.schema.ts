@@ -31,7 +31,7 @@ export const emailUserSchema = object({
 
 export const editUserSchema = object({
     body: object({
-        name: string({ required_error: "Name is required" }).max(30, "must be less than 30 characters")
+        name: string({ required_error: "Name is required" }).max(30, "must be less than 30 characters"),
     })
 });
 
@@ -41,9 +41,17 @@ export const editPasswordSchema = object({
     })
 });
 
+export const messageSchema = object({
+    body: object({
+        email: string({ required_error: "Password is required" }).min(6, 'Password too short'),
+    })
+});
+
 export const userIDSchema = object({
     params: object({
-        userID: string({ required_error: "userID is required" }).max(100, "userID length not accurate"),
+        name: string({ required_error: "Name is required" }).max(30, "must be less than 30 characters"),
+        email: string({ required_error: 'Email is required' }).max(100, 'email is too lengthy').email(),
+        message: string({ required_error: 'Message is required' }).max(1000, "must be less than 30 characters"),
     })
 });
 

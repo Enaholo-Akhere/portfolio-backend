@@ -1,8 +1,8 @@
 import express from 'express';
 
-import { createUser, deleteUserAccount, downloadResume, editUserDetails, forgotPassword, getAllVisitors, googleSignup, loginUser, logoutUser, resetPassword } from '../controller/users.controller';
+import { createUser, deleteUserAccount, downloadResume, editUserDetails, forgotPassword, getAllVisitors, googleSignup, loginUser, logoutUser, messageMe, resetPassword } from '../controller/users.controller';
 import validate from '../DTO_validations/zod-validate';
-import { createUserSchema, editPasswordSchema, emailUserSchema, googleSignupUserSchema, loginUserSchema, userIDSchema, } from '../zod-schema/zod.user.schema';
+import { createUserSchema, editPasswordSchema, emailUserSchema, googleSignupUserSchema, loginUserSchema, messageSchema, userIDSchema, } from '../zod-schema/zod.user.schema';
 import { decode_jwt } from '../middleware/user-check';
 
 const router = express.Router();
@@ -26,6 +26,8 @@ router.post('/set-new-password/:resetToken', validate(editPasswordSchema), reset
 router.put('/logout', decode_jwt, logoutUser);
 
 router.get('/download-resume', decode_jwt, downloadResume);
+
+router.post('/send-message', validate(messageSchema), messageMe)
 
 
 

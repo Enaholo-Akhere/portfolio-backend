@@ -18,6 +18,15 @@ CREATE TABLE user_reset_password (
     email VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE user_message_me (
+    serial SERIAL PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    name VARCHAR(60) NOT NULL,
+    message VARCHAR(1000) NOT NULL,
+    created_on timestamp default CURRENT_TIMESTAMP not null,
+    updated_on timestamp default CURRENT_TIMESTAMP not null
+);
+
 
 -- TRIGGER and PROCEDURE functions
 CREATE  FUNCTION update_updated_on_user_task()

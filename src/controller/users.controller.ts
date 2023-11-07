@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
-import { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService } from "../services/users.services";
-import { userRegData, userLogin, decodedData } from "../types/types.user";
+import { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService, messageMeService } from "../services/users.services";
+import { userRegData, userLogin, decodedData, messageMeInterface } from "../types/types.user";
 import _ from "lodash";
 import { sendEmail } from "../utils/nodemailer";
 import { readJwt } from "../middleware/jwt-encryption";
@@ -43,6 +43,8 @@ const editUserDetails = async (req: Request, res: Response) => {
     const { userID: user_id } = req.params;
     const { name } = req.body;
     const decoded: decodedData = res.locals.user;
+    console.log('decoded', decoded);
+
 
     if (user_id === decoded?.user_id) {
 
@@ -131,5 +133,18 @@ const downloadResume = async (req: Request, res: Response) => {
     }
 };
 
+const messageMe = async (req: Request, res: Response) => {
+    const messageMeDetail: messageMeInterface = req.body;
 
-export { createUser, loginUser, editUserDetails, deleteUserAccount, getAllVisitors, forgotPassword, resetPassword, googleSignup, logoutUser, downloadResume } 
+    const { data, error } = await messageMeService(messageMeDetail);
+    console.log('error', error, 'data', data);
+
+    if (error) {
+        return res.status(400).json({ message: error.message, status: 'failed' })
+    } else {
+        return res.status(200).json({ data, message: 'message sent successfully', status: 'success' });
+    }
+};
+
+
+export { messageMe, createUser, loginUser, editUserDetails, deleteUserAccount, getAllVisitors, forgotPassword, resetPassword, googleSignup, logoutUser, downloadResume } 
