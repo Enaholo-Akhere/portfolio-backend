@@ -137,13 +137,13 @@ const messageMe = async (req: Request, res: Response) => {
     const messageMeDetail: messageMeInterface = req.body;
 
     const { data, error } = await messageMeService(messageMeDetail);
-    console.log('error', error, 'data', data);
 
     if (error) {
         return res.status(400).json({ message: error.message, status: 'failed' })
-    } else {
-        return res.status(200).json({ data, message: 'message sent successfully', status: 'success' });
-    }
+    };
+
+
+    if (data) return res.status(200).json({ message: 'message sent successfully', status: 'success' });
 };
 
 

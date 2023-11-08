@@ -10,7 +10,7 @@ import { customAlphabet } from 'nanoid';
 import config from 'config';
 import { readJwt, writeJwt } from "../middleware/jwt-encryption";
 import _ from "lodash";
-import { sendForgotPasswordEmail } from "../utils/nodemailer";
+import { sendForgotPasswordEmail, responseMessageEmail, sendMeAMessage } from "../utils/nodemailer";
 import { JwtPayload } from 'jsonwebtoken';
 import generator from 'generate-password';
 import path from 'path';
@@ -221,10 +221,12 @@ const downloadResumeService = async (req: any, res: any) => {
 };
 
 const messageMeService = async (messageMeService: messageMeInterface) => {
-    const { email, name, message } = messageMeService;
+    const { email, name, message, subject } = messageMeService;
     try {
-        const { rows } = await pool_dev.query(SEND_MESSAGE, [email, name, message]);
+        const { rows } = await pool_dev.query(SEND_MESSAGE, [email, name, message, subject]);
         const data = rows[0];
+        await sendMeAMessage(data);
+        await responseMessageEmail(data)
         return { data }
     }
     catch (error: any) {

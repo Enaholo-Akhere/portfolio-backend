@@ -23,6 +23,7 @@ CREATE TABLE user_message_me (
     email VARCHAR(100) NOT NULL,
     name VARCHAR(60) NOT NULL,
     message VARCHAR(1000) NOT NULL,
+    subject VARCHAR(250),
     created_on timestamp default CURRENT_TIMESTAMP not null,
     updated_on timestamp default CURRENT_TIMESTAMP not null
 );

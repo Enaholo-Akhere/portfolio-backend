@@ -1,10 +1,12 @@
 import nodemailer from 'nodemailer';
 import config from 'config';
 import { winston_logger } from './logger';
-import { mailOptions, forgotPassword } from '../types/types.user';
+import { mailOptions, forgotPassword, messageMeInterface } from '../types/types.user';
 import { emailTemplate } from './email-template';
 import { decodedData } from '../types/types.user';
 import { forgotPasswordTemplate } from './forgot-password-template';
+import { autoResponseTemplate } from './auto-response';
+import { sendMeMessageTemplate } from './sent-me-message';
 
 const transporter = nodemailer.createTransport({
     service: config.get('e_service'),
@@ -17,7 +19,7 @@ const transporter = nodemailer.createTransport({
 // testing the transporter
 transporter.verify((err, success: Boolean) => {
     if (err) {
-        console.log(err);
+        console.log(err.message);
     } else {
         console.log('nodemailer', success);
     }
@@ -51,7 +53,37 @@ const sendForgotPasswordEmail = async (respData: forgotPassword) => {
     }
     catch (error: any) {
         winston_logger.error(error.message, error.stack)
+    };
+};
+
+const responseMessageEmail = async (respData: messageMeInterface) => {
+    const mailOptions = <mailOptions>{
+        from: config.get('auth_email'),
+        to: respData.email,
+        subject: 'Thanks for reaching out',
+        html: autoResponseTemplate(respData),
+    };
+    try {
+        await transporter.sendMail(mailOptions);
+    }
+    catch (error: any) {
+        winston_logger.error(error.message, error.stack)
     }
 }
 
-export { sendEmail, sendForgotPasswordEmail }
+const sendMeAMessage = async (data: messageMeInterface) => {
+
+    const mailOptions = <mailOptions>{
+        from: config.get('auth_email'),
+        to: config.get('auth_email'),
+        subject: data.subject,
+        html: sendMeMessageTemplate(data),
+    };
+    try {
+        await transporter.sendMail(mailOptions);
+    }
+    catch (error: any) {
+        winston_logger.error(error.message, error.stack)
+    }
+}
+export { sendEmail, sendForgotPasswordEmail, responseMessageEmail, sendMeAMessage }
