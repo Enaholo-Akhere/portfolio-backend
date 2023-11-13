@@ -23,7 +23,7 @@ router.post('/request-reset-password', validate(emailUserSchema), forgotPassword
 
 router.post('/set-new-password/:resetToken', validate(editPasswordSchema), resetPassword);
 
-router.put('/logout', decode_jwt, logoutUser);
+router.put('/logout/:userID', logoutUser);
 
 router.get('/download-resume', decode_jwt, downloadResume);
 

@@ -16,6 +16,6 @@ export const UPDATE_RESET_PASSWORD = 'UPDATE user_reset_password SET email = $1,
 export const DELETE_RESET_PASSWORD = "DELETE FROM user_reset_password WHERE email = $1 RETURNING *"
 
 //send-message
-export const SEND_MESSAGE = 'INSERT INTO user_message_me (email, name, message) VALUES ($1, $2, $3) RETURNING *';
+export const SEND_MESSAGE = 'INSERT INTO user_message_me (email, name, message, subject) VALUES ($1, $2, $3, $4) RETURNING *';
 export const GET_ALL_MESSAGES = 'SELECT * FROM user_message_me';
 export const GET_MESSAGE_VIA_EMAIL = 'SELECT * FROM user_message_me WHERE email = $1'

@@ -112,11 +112,10 @@ const resetPassword = async (req: Request, res: Response) => {
     return res.status(401).json({ message: 'nothing to reset', status: 'failed' });
 };
 
-type token = string
 const logoutUser = async (req: Request, res: Response) => {
-    const decoded: decodedData = res.locals.user;
+    const { userID } = req.params;
 
-    const { message, error } = await logoutService(decoded);
+    const { message, error } = await logoutService(userID);
     if (error) return res.status(404).json({ message: error.message, status: 'failed', data: {} })
 
     return res.status(200).json({ message, status: 'success', data: {} });
@@ -137,13 +136,13 @@ const messageMe = async (req: Request, res: Response) => {
     const messageMeDetail: messageMeInterface = req.body;
 
     const { data, error } = await messageMeService(messageMeDetail);
-    console.log('error', error, 'data', data);
 
     if (error) {
         return res.status(400).json({ message: error.message, status: 'failed' })
-    } else {
-        return res.status(200).json({ data, message: 'message sent successfully', status: 'success' });
-    }
+    };
+
+
+    if (data) return res.status(200).json({ message: 'message sent successfully', status: 'success' });
 };
 
 

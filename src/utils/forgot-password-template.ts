@@ -35,7 +35,7 @@ export const forgotPasswordTemplate = (data: forgotPassword) => {
                         </td>
                     </tr>
                      <tr>
-                         <td bgcolor="#f4f4f4" style="text-align: center; padding: 10px;">
+                         <td  style="text-align: center; padding: 10px; background-color: #f4f4f4;">
                             <p>&copy; 2023 Enaholo Akhere. All rights reserved.</p>
                      </td>
                     </tr>
