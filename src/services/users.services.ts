@@ -188,15 +188,14 @@ const resetPasswordService = async (password: string, decoded: decodedData) => {
 };
 
 
-const logoutService = async (decoded: decodedData) => {
+const logoutService = async (userID: string) => {
 
-    console.log('decoded', decoded.user_id);
 
     const token = writeJwt({}, { expiresIn: config.get<string>('logoutTTL') });
     const refreshed_token = writeJwt({}, { expiresIn: config.get<string>('logoutTTL') });
 
     try {
-        await pool_dev.query(REFRESH_TOKEN, [token, refreshed_token, decoded.user_id]);
+        await pool_dev.query(REFRESH_TOKEN, [token, refreshed_token, userID]);
 
         const message = 'logged out successfully'
         return { message }

@@ -112,11 +112,10 @@ const resetPassword = async (req: Request, res: Response) => {
     return res.status(401).json({ message: 'nothing to reset', status: 'failed' });
 };
 
-type token = string
 const logoutUser = async (req: Request, res: Response) => {
-    const decoded: decodedData = res.locals.user;
+    const { userID } = req.params;
 
-    const { message, error } = await logoutService(decoded);
+    const { message, error } = await logoutService(userID);
     if (error) return res.status(404).json({ message: error.message, status: 'failed', data: {} })
 
     return res.status(200).json({ message, status: 'success', data: {} });
