@@ -1,17 +1,16 @@
 import { decodedData, messageMeInterface, resetPasswordInterface } from './../types/types.user';
 import { userRegData, userLogin, forgotPassword } from "../types/types.user";
 import hash_password from "../utils/hash-password";
-import pool_dev from "../database/db";
+import pool from "../database/db";
 import { winston_logger } from "../utils/logger";
 import { REGISTER_USER, LOGIN_USER, EDIT_USER, REFRESH_TOKEN, DELETE_USER_ACCOUNT, GET_ALL_VISITORS, CHECK_EMAIL_EXIST, REQUEST_RESET_PASSWORD, CHECK_RESET_EMAIL_EXIST, UPDATE_RESET_PASSWORD, RESET_PASSWORD, DELETE_RESET_PASSWORD, SEND_MESSAGE } from '../database/queries'
 import { checkEmailExist } from "../utils/check-email-exist";
 import comparePassword from "../utils/compare-password";
 import { customAlphabet } from 'nanoid';
 import config from 'config';
-import { readJwt, writeJwt } from "../middleware/jwt-encryption";
+import { writeJwt } from "../middleware/jwt-encryption";
 import _ from "lodash";
 import { sendForgotPasswordEmail, responseMessageEmail, sendMeAMessage } from "../utils/nodemailer";
-import { JwtPayload } from 'jsonwebtoken';
 import generator from 'generate-password';
 import path from 'path';
 import fs from 'fs';
@@ -35,7 +34,7 @@ const createUserService = async (body: userRegData) => {
             throw new Error('email already exist')
         }
 
-        const pg_data = await pool_dev.query(REGISTER_USER, [password, email, name, user_id, token, refreshed_token]);
+        const pg_data = await pool.query(REGISTER_USER, [password, email, name, user_id, token, refreshed_token]);
 
         return { pg_data };
     }
@@ -65,7 +64,7 @@ const googleSignupService = async (body: userRegData) => {
 const loginUserServices = async (loginDetails: userLogin) => {
     const { email, password } = loginDetails;
     try {
-        const result = await pool_dev.query(LOGIN_USER, [email]);
+        const result = await pool.query(LOGIN_USER, [email]);
 
         if (result?.rows.length) {
             const { user_id, name, email: emailPG } = result.rows[0];
@@ -75,7 +74,7 @@ const loginUserServices = async (loginDetails: userLogin) => {
             const db_password = result?.rows[0].password
             const { comparePassword: isPassword } = await comparePassword(db_password, password);
             if (isPassword) {
-                const login_data = await pool_dev.query(REFRESH_TOKEN, [token, refreshed_token, user_id]);
+                const login_data = await pool.query(REFRESH_TOKEN, [token, refreshed_token, user_id]);
 
                 return { data: login_data?.rows[0] };
             } else {
@@ -98,7 +97,7 @@ const editUserService = async (decoded: decodedData, name: string) => {
 
     try {
 
-        const edited_user = await pool_dev.query(EDIT_USER, [name, user_id])
+        const edited_user = await pool.query(EDIT_USER, [name, user_id])
         const result = edited_user.rows[0]
         return { result }
     }
@@ -113,7 +112,7 @@ const deleteUserAccountService = async (user_id: string) => {
     try {
         if (!user_id) throw new Error('ID not valid')
 
-        const { rowCount } = await pool_dev.query(DELETE_USER_ACCOUNT, [user_id])
+        const { rowCount } = await pool.query(DELETE_USER_ACCOUNT, [user_id])
 
         return { rowCount }
     }
@@ -125,7 +124,7 @@ const deleteUserAccountService = async (user_id: string) => {
 
 const getAllVisitorsService = async () => {
     try {
-        const { rows: data } = await pool_dev.query(GET_ALL_VISITORS);
+        const { rows: data } = await pool.query(GET_ALL_VISITORS);
 
         return { data }
     }
@@ -140,21 +139,21 @@ const forgotPasswordService = async (email: string) => {
     try {
 
         const resetPasswordToken = writeJwt({ email }, { expiresIn: config.get<string>('resetPasswordTokenTTL') });
-        const { rows: emailExist } = await pool_dev.query(CHECK_EMAIL_EXIST, [email]);
+        const { rows: emailExist } = await pool.query(CHECK_EMAIL_EXIST, [email]);
         if (!emailExist.length) throw new Error('email does not exist');
 
-        const { rows: respRows } = await pool_dev.query(CHECK_RESET_EMAIL_EXIST, [email]);
+        const { rows: respRows } = await pool.query(CHECK_RESET_EMAIL_EXIST, [email]);
         console.log('rep role', respRows);
 
         if (respRows.length) {
-            const { rows } = await pool_dev.query(UPDATE_RESET_PASSWORD, [email, resetPasswordToken]);
+            const { rows } = await pool.query(UPDATE_RESET_PASSWORD, [email, resetPasswordToken]);
             const respData: forgotPassword = rows[0];
 
 
             await sendForgotPasswordEmail(respData);
             return { respData };
         } else {
-            const { rows } = await pool_dev.query(REQUEST_RESET_PASSWORD, [email, resetPasswordToken]);
+            const { rows } = await pool.query(REQUEST_RESET_PASSWORD, [email, resetPasswordToken]);
 
             const respData: forgotPassword = rows[0];
             await sendForgotPasswordEmail(respData);
@@ -175,10 +174,10 @@ const resetPasswordService = async (password: string, decoded: decodedData) => {
 
         if (error) throw new Error('could not hash the password');
 
-        const { rows } = await pool_dev.query(RESET_PASSWORD, [new_password, decoded?.email]);
+        const { rows } = await pool.query(RESET_PASSWORD, [new_password, decoded?.email]);
         const data = rows[0];
 
-        const { rowCount } = await pool_dev.query(DELETE_RESET_PASSWORD, [decoded.email])
+        const { rowCount } = await pool.query(DELETE_RESET_PASSWORD, [decoded.email])
         return { data, rowCount }
     }
     catch (error: any) {
@@ -195,7 +194,7 @@ const logoutService = async (userID: string) => {
     const refreshed_token = writeJwt({}, { expiresIn: config.get<string>('logoutTTL') });
 
     try {
-        await pool_dev.query(REFRESH_TOKEN, [token, refreshed_token, userID]);
+        await pool.query(REFRESH_TOKEN, [token, refreshed_token, userID]);
 
         const message = 'logged out successfully'
         return { message }
@@ -222,10 +221,18 @@ const downloadResumeService = async (req: any, res: any) => {
 const messageMeService = async (messageMeService: messageMeInterface) => {
     const { email, name, message, subject } = messageMeService;
     try {
-        const { rows } = await pool_dev.query(SEND_MESSAGE, [email, name, message, subject]);
+        const { rows } = await pool.query(SEND_MESSAGE, [email, name, message, subject]);
         const data = rows[0];
-        await sendMeAMessage(data);
-        await responseMessageEmail(data)
+        const allPromises = [sendMeAMessage(data), responseMessageEmail(data)]
+
+        const result = await Promise.allSettled(allPromises);
+
+        result.forEach((result) => {
+            if (result.status === 'rejected') {
+                throw new Error('error got here')
+            }
+        })
+
         return { data }
     }
     catch (error: any) {
