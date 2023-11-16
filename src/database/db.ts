@@ -6,7 +6,7 @@ const pool_dev = new Pool({
     user: 'postgres',
     password: config.get<string>('pgpassword'),
     host: 'localhost',
-    database: 'my_portfolio',
+    database: config.get<string>('db_name'),
     port: 5432,
 });
 
