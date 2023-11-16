@@ -7,7 +7,7 @@ const pool_dev = new Pool({
     password: config.get<string>('pgpassword'),
     host: 'localhost',
     database: config.get<string>('db_name'),
-    port: 5432,
+    port: config.get<number>('db_port'),
 });
 
 const pool_prod = new Pool({
