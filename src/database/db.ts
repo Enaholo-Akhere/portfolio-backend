@@ -2,11 +2,11 @@ import { Pool } from 'pg';
 import config from 'config'
 
 
-const db_name = config.get<string>('db_name');
+// const db_name = config.get<string>('db_name');
 const pg_password = config.get<string>('pg_password');
 const pg_port = config.get<number>('pg_port');
 
-console.log('db name', db_name, pg_password, pg_port);
+console.log('db name', pg_password, pg_port);
 
 const pool_dev = new Pool({
     user: 'postgres',
