@@ -1,4 +1,4 @@
-import express, { application } from 'express';
+import express from 'express';
 import config from 'config';
 import uncaught_exception_error from './utils/error_handler';
 import userRoute from '../src/routes/user.routers'
