@@ -41,3 +41,11 @@
 {"level":"error","message":"No recipients defined","timestamp":"2023-11-16T14:39:24.074Z"}
 {"level":"error","message":"error got here error got here","stack":"Error: error got here\n    at /Users/user/Documents/Techs/my-portfolio/forty-backend/src/services/users.services.ts:233:23\n    at Array.forEach (<anonymous>)\n    at /Users/user/Documents/Techs/my-portfolio/forty-backend/src/services/users.services.ts:231:16\n    at Generator.next (<anonymous>)\n    at fulfilled (/Users/user/Documents/Techs/my-portfolio/forty-backend/src/services/users.services.ts:5:58)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2023-11-16T14:54:36.606Z"}
 {"level":"error","message":"failed failed","stack":"Error: failed\n    at /Users/user/Documents/Techs/my-portfolio/forty-backend/src/services/users.services.ts:226:67\n    at Generator.next (<anonymous>)\n    at fulfilled (/Users/user/Documents/Techs/my-portfolio/forty-backend/src/services/users.services.ts:5:58)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)","timestamp":"2023-11-16T14:57:27.319Z"}
+{"level":"error","message":"email already exist","timestamp":"2023-11-16T15:52:55.727Z"}
+{"address":"::1","code":"ECONNREFUSED","errno":-61,"level":"error","message":"connect ECONNREFUSED ::1:5432 connect ECONNREFUSED ::1:5432","port":5432,"stack":"Error: connect ECONNREFUSED ::1:5432\n    at /Users/user/Documents/Techs/my-portfolio/forty-backend/node_modules/pg-pool/index.js:45:11\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)","syscall":"connect","timestamp":"2023-11-20T09:33:06.675Z"}
+{"level":"error","message":"connect ECONNREFUSED ::1:5432","timestamp":"2023-11-20T10:03:51.942Z"}
+{"level":"error","message":"connect ECONNREFUSED ::1:5432","timestamp":"2023-11-20T10:03:51.945Z"}
+{"level":"error","message":"connect ECONNREFUSED ::1:5432","timestamp":"2023-11-20T10:29:26.214Z"}
+{"level":"error","message":"connect ECONNREFUSED ::1:5432","timestamp":"2023-11-20T10:29:26.216Z"}
+{"level":"error","message":"email already exist","timestamp":"2023-11-20T10:55:03.133Z"}
+{"level":"error","message":"email already exist","timestamp":"2023-11-20T12:54:45.435Z"}
