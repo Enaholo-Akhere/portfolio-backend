@@ -12,7 +12,7 @@ const pool_dev = new Pool({
     user: 'postgres',
     password: pg_password,
     host: 'localhost',
-    database: db_name,
+    database: 'my_portfolio',
     port: pg_port,
 });
 
