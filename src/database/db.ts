@@ -4,7 +4,7 @@ import config from 'config'
 
 const pool_dev = new Pool({
     user: 'postgres',
-    password: config.get<string>('pg_password'),
+    password: 'asdf',
     host: 'localhost',
     database: config.get<string>('db_name'),
     port: config.get<number>('pg_port'),
