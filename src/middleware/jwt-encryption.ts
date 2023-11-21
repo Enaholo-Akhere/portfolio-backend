@@ -7,10 +7,11 @@ type NewType = ArrayBuffer | SharedArrayBuffer | {
     valueOf(): ArrayBuffer | SharedArrayBuffer;
 }
 
-const PRIVATE_KEY = process.env.PRIVATE_KEY as string
-const PUBLIC_KEY = process.env.PUBLIC_KEY as string
+interface privateKey { }
+const PRIVATE_KEY = (process.env.PRIVATE_KEY) as any;
+const PUBLIC_KEY = process.env.PUBLIC_KEY as any
 
-const publicKey = Buffer.from(PUBLIC_KEY, 'base64').toString('ascii');
+const publicKey = Buffer.from(PUBLIC_KEY, 'base64',).toString('ascii');
 const privateKey = Buffer.from(PRIVATE_KEY, 'base64').toString('ascii');
 
 console.log('enaholo', process.env.ENAHOLO);
