@@ -2,7 +2,7 @@ import express from 'express';
 
 import { createUser, deleteUserAccount, downloadResume, editUserDetails, forgotPassword, getAllVisitors, googleSignup, loginUser, logoutUser, messageMe, resetPassword } from '../controller/users.controller';
 import validate from '../DTO_validations/zod-validate';
-import { createUserSchema, editPasswordSchema, emailUserSchema, googleSignupUserSchema, loginUserSchema, messageSchema, userIDSchema, } from '../zod-schema/zod.user.schema';
+import { createUserSchema, editPasswordSchema, editUserSchema, emailUserSchema, googleSignupUserSchema, loginUserSchema, messageSchema, userIDSchema, } from '../zod-schema/zod.user.schema';
 import { decode_jwt } from '../middleware/user-check';
 
 const router = express.Router();
@@ -15,7 +15,7 @@ router.post('/google-signup', validate(googleSignupUserSchema), googleSignup);
 
 router.post('/login', validate(loginUserSchema), loginUser);
 
-router.put('/edit/:userID', [decode_jwt, validate(userIDSchema)], editUserDetails);
+router.put('/edit/:userID', [decode_jwt, validate(editUserSchema)], editUserDetails);
 
 router.delete('/delete-user-account/:userID', [decode_jwt, validate(userIDSchema)], deleteUserAccount);
 

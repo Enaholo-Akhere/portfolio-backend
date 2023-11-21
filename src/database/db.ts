@@ -6,11 +6,7 @@ env.config();
 
 
 const app = express();
-
-// const pg_password = config.get<string>('pg_password');
-// const pg_port = config.get<number>('pg_port');
 const pg_neon = process.env.PG_NEON;
-console.log('db name', pg_neon, 'ENV', app.get('env'));
 
 const pool_dev = new Pool({
     user: 'postgres',

@@ -6,23 +6,13 @@ import { winston_logger } from "../utils/logger";
 type NewType = ArrayBuffer | SharedArrayBuffer | {
     valueOf(): ArrayBuffer | SharedArrayBuffer;
 }
-interface pub {
-    PUBLIC_KEY: any;
-    base64: any;
-}
 
 const base64 = 'base64'
-const PRIVATE_KEY: any = process.env.PRIVATE_KEY;
-const PUBLIC_KEY: any = process.env.PUBLIC_KEY;
+const PRIVATE_KEY = (process.env.PRIVATE_KEY) as string;
+const PUBLIC_KEY = (process.env.PUBLIC_KEY) as string;
 
 const publicKey = Buffer.from(PUBLIC_KEY, base64).toString('ascii')
 const privateKey = Buffer.from(PRIVATE_KEY, base64).toString('ascii');
-
-// console.log('enaholo', publicKey);
-
-
-
-
 
 const writeJwt = (object: Object, options?: jwt.SignOptions | undefined) => {
     const jwtSign = jwt.sign(object, privateKey, {

@@ -43,13 +43,12 @@ const editUserDetails = async (req: Request, res: Response) => {
     const { userID: user_id } = req.params;
     const { name } = req.body;
     const decoded: decodedData = res.locals.user;
-    console.log('decoded', decoded);
 
 
     if (user_id === decoded?.user_id) {
 
         const { result, error } = await editUserService(decoded, name);
-        if (error) return res.status(400).json({ data: {}, message: error.message, status: 'failed' })
+        if (error) return res.status(400).json({ message: error.message, status: 'failed' })
         const data = _.omit(result, ['password'])
         return res.status(200).json({ data, message: 'Edited successfully', status: 'success' })
     } else {
@@ -77,11 +76,18 @@ const deleteUserAccount = async (req: Request, res: Response) => {
 
 
 const getAllVisitors = async (req: Request, res: Response) => {
-    const { data, error } = await getAllVisitorsService();
-    if (error) {
-        return res.status(400).json({ data: {}, message: error.message, status: 'failed' })
+    const decoded: decodedData = res.locals.user;
+    if (Object.keys(decoded).length) {
+
+        const { data, error } = await getAllVisitorsService();
+        if (error) {
+            return res.status(400).json({ data: {}, message: error.message, status: 'failed' })
+        }
+        return res.status(200).json({ data, message: 'all users fetched successfully', status: 'success' });
+    } else {
+        return res.status(400).json({ data: {}, message: 'Please login', status: 'failed' })
+
     }
-    return res.status(200).json({ data, message: 'all users fetched successfully', status: 'success' });
 
 };
 
