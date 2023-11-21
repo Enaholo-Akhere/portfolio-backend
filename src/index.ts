@@ -11,7 +11,6 @@ import fs from 'fs';
 const app = express();
 const PORT = config.get<number>('PORT');
 const ver = process.env.VERSION;
-console.log('verse', ver);
 
 
 
@@ -24,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //Routes
-app.get(`/${ver}`, (req, res) => {
+app.get(`/${ver}/user`, (req, res) => {
     res.send('hello world')
 })
 
