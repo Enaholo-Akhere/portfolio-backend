@@ -3,7 +3,6 @@ import config from 'config';
 import uncaught_exception_error from './utils/error_handler';
 import userRoute from '../src/routes/user.routers'
 import cors from 'cors';
-// import { base64Env } from './utils/base64-env';
 
 import path from 'path';
 import fs from 'fs';
@@ -11,7 +10,9 @@ import fs from 'fs';
 
 const app = express();
 const PORT = config.get<number>('PORT');
-const ver = config.get('vers')
+const ver = process.env.VERSION;
+console.log('verse', ver);
+
 
 
 //error handler
@@ -21,12 +22,9 @@ uncaught_exception_error();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(base64Env());
-
-// base64Env()
 
 //Routes
-app.get(`/${ver}/user`, (req, res) => {
+app.get(`/${ver}`, (req, res) => {
     res.send('hello world')
 })
 
