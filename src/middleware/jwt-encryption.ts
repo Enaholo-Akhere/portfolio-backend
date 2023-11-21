@@ -6,13 +6,17 @@ import { winston_logger } from "../utils/logger";
 type NewType = ArrayBuffer | SharedArrayBuffer | {
     valueOf(): ArrayBuffer | SharedArrayBuffer;
 }
+interface pub {
+    PUBLIC_KEY: any;
+    base64: any;
+}
 
-interface privateKey { }
-const PRIVATE_KEY = (process.env.PRIVATE_KEY) as any;
-const PUBLIC_KEY = process.env.PUBLIC_KEY as any
+const base64 = 'base64'
+const PRIVATE_KEY: any = process.env.PRIVATE_KEY;
+const PUBLIC_KEY: any = process.env.PUBLIC_KEY;
 
-const publicKey = Buffer.from(PUBLIC_KEY, 'base64',).toString('ascii');
-const privateKey = Buffer.from(PRIVATE_KEY, 'base64').toString('ascii');
+const publicKey = Buffer.from(PUBLIC_KEY, base64).toString('ascii')
+const privateKey = Buffer.from(PRIVATE_KEY, base64).toString('ascii');
 
 console.log('enaholo', process.env.ENAHOLO);
 
