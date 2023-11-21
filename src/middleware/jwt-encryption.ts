@@ -1,11 +1,23 @@
 import { decodedData } from './../types/types.user';
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import config from 'config';
 import { winston_logger } from "../utils/logger";
 
+type NewType = ArrayBuffer | SharedArrayBuffer | {
+    valueOf(): ArrayBuffer | SharedArrayBuffer;
+}
 
-const privateKey = config.get<string>('private_key');
-const publicKey = config.get<string>('public_key');
+const PRIVATE_KEY = process.env.PRIVATE_KEY as string
+const PUBLIC_KEY = process.env.PUBLIC_KEY as string
+
+const publicKey = Buffer.from(PUBLIC_KEY, 'base64').toString('ascii');
+const privateKey = Buffer.from(PRIVATE_KEY, 'base64').toString('ascii');
+
+console.log('enaholo', process.env.ENAHOLO);
+
+
+
+
 
 const writeJwt = (object: Object, options?: jwt.SignOptions | undefined) => {
     const jwtSign = jwt.sign(object, privateKey, {

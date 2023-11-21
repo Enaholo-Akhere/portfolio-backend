@@ -3,6 +3,7 @@ import config from 'config';
 import uncaught_exception_error from './utils/error_handler';
 import userRoute from '../src/routes/user.routers'
 import cors from 'cors';
+// import { base64Env } from './utils/base64-env';
 
 import path from 'path';
 import fs from 'fs';
@@ -19,7 +20,10 @@ uncaught_exception_error();
 //middlewares
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }));
+// app.use(base64Env());
+
+// base64Env()
 
 //Routes
 app.get(`/${ver}/user`, (req, res) => {

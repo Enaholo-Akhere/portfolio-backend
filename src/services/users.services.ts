@@ -15,10 +15,10 @@ import generator from 'generate-password';
 import path from 'path';
 import fs from 'fs';
 
-
+const NANO_CUSTOM_ID = process.env.NANO_CUSTOM_ID as string;
 
 const createUserService = async (body: userRegData) => {
-    const nanoid = customAlphabet(config.get('customNanoID'), 20)
+    const nanoid = customAlphabet(NANO_CUSTOM_ID, 20)
     const user_id = `user_id${nanoid()}`
     const token = writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('tokenTTL') });
     const refreshed_token = writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('refreshedTokenTTL') });
@@ -45,7 +45,7 @@ const createUserService = async (body: userRegData) => {
 }
 
 const googleSignupService = async (body: userRegData) => {
-    const nanoid = customAlphabet(config.get('customNanoID'), 20);
+    const nanoid = customAlphabet(NANO_CUSTOM_ID, 20);
     const user_id = `user_id${nanoid()}`
     const token = writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('tokenTTL') });
     const refreshed_token = writeJwt({ ...body, user_id }, { expiresIn: config.get<string>('refreshedTokenTTL') });

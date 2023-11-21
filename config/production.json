@@ -1,0 +1,10 @@
+{
+  "vers": "api/v1",
+
+  "tokenTTL": "60m",
+  "refreshedTokenTTL": "1d",
+  "logoutTTL": "1s",
+  "e_service": "gmail",
+  "resetPasswordTokenTTL": "30m",
+  "URL_PROD": "https://e-folio-enaholo-akhere.netlify.app"
+}

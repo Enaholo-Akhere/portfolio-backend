@@ -1,0 +1,19 @@
+{
+  "PORT": 5600,
+  "pg_port": 5432,
+  "db_name": "my_portfolio",
+  "vers": "api/v1",
+  "saltRoundFactor": 10,
+  "pg_password": "asdf",
+  "customNanoID": "abcdefikl£eMKSTst_uvwxyx0987654321",
+  "tokenTTL": "60m",
+  "refreshedTokenTTL": "1d",
+  "logoutTTL": "1s",
+  "auth_email": "enaholoa@gmail.com",
+  "auth_password": "eimdszsnvngnyjfw",
+  "e_service": "gmail",
+  "resetPasswordTokenTTL": "30m",
+  "URL_DEV": "http://localhost:3000",
+  "URL_PROD": "",
+  "pg_neon": "postgresql://Enaholo-Akhere:qO2ZNz5BcLeu@ep-steep-leaf-20820975-pooler.us-east-2.aws.neon.tech/my-portfolio?sslmode=require"
+}

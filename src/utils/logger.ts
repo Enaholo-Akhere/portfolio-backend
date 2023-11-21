@@ -6,7 +6,6 @@ import { transports, format, createLogger } from 'winston'
 const winston_logger = createLogger({
     transports: [
         new transports.Console({
-            // filename: 'info-logger.log',
             level: 'info',
             format: format.combine(format.timestamp(), format.json()),
         }),

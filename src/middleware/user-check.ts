@@ -6,7 +6,6 @@ import _ from 'lodash';
 import { regenerate_token } from '../utils/regenerate-token';
 
 
-
 const decode_jwt = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.get('authorization')?.split(' ')[1];
     const refreshToken = req.get('x-refresh-token');
