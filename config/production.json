@@ -1,6 +1,8 @@
 {
   "vers": "api/v1",
-
+  "PORT": 5600,
+  "pg_port": 5432,
+  "pg_name": "my_portfolio",
   "tokenTTL": "60m",
   "refreshedTokenTTL": "1d",
   "logoutTTL": "1s",
