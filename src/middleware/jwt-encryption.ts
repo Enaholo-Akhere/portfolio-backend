@@ -15,10 +15,10 @@ const base64 = 'base64'
 const PRIVATE_KEY: any = process.env.PRIVATE_KEY;
 const PUBLIC_KEY: any = process.env.PUBLIC_KEY;
 
-const publicKey = Buffer.from(PUBLIC_KEY, base64).toString('ascii')
-const privateKey = Buffer.from(PRIVATE_KEY, base64).toString('ascii');
+const publicKey = Buffer.from(PUBLIC_KEY, base64).toString()
+const privateKey = Buffer.from(PRIVATE_KEY, base64).toString();
 
-console.log('enaholo', process.env.ENAHOLO);
+// console.log('enaholo', publicKey);
 
 
 
