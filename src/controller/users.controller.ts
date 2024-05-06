@@ -1,10 +1,11 @@
 import { Response, Request } from "express";
-import { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService, messageMeService } from "../services/users.services";
+import { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService, messageMeService, verifyUserService } from "../services/users.services";
 import { userRegData, userLogin, decodedData, messageMeInterface } from "../types/types.user";
 import _ from "lodash";
 import { sendEmail } from "../utils/nodemailer";
 import { readJwt } from "../middleware/jwt-encryption";
 import { JwtPayload } from "jsonwebtoken";
+import { emailTemplate } from "../utils/email-template";
 
 
 const createUser = async (req: Request<{}, {}, userRegData>, res: Response) => {
@@ -41,6 +42,7 @@ const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) => {
 
 const editUserDetails = async (req: Request, res: Response) => {
     const { userID: user_id } = req.params;
+
     const { name } = req.body;
     const decoded: decodedData = res.locals.user;
 
@@ -53,6 +55,21 @@ const editUserDetails = async (req: Request, res: Response) => {
         return res.status(200).json({ data, message: 'Edited successfully', status: 'success' })
     } else {
         return res.status(400).json({ data: {}, message: 'invalid user_ID provided', status: 'failed' })
+    }
+};
+
+
+const verifyUser = async (req: Request, res: Response) => {
+    const { userID: user_id, token } = req.params;
+
+    if (user_id) {
+
+        const { result, error } = await verifyUserService(user_id, token);
+        if (error) return res.status(400).json({ message: error.message, status: 'failed' })
+
+        return res.status(200).json({ message: 'Verified successfully', status: 'success' })
+    } else {
+        return res.status(400).json({ data: {}, message: ' cannot verify user', status: 'failed' })
     }
 };
 
@@ -152,4 +169,4 @@ const messageMe = async (req: Request, res: Response) => {
 };
 
 
-export { messageMe, createUser, loginUser, editUserDetails, deleteUserAccount, getAllVisitors, forgotPassword, resetPassword, googleSignup, logoutUser, downloadResume } 
+export { messageMe, createUser, loginUser, editUserDetails, deleteUserAccount, getAllVisitors, forgotPassword, resetPassword, googleSignup, logoutUser, downloadResume, verifyUser } 

@@ -9,7 +9,8 @@ export interface userRegData {
 
 export interface userLogin {
     password: string;
-    email: string
+    email: string;
+    isverified: boolean;
 }
 
 export interface decodedData {

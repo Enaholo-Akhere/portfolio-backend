@@ -45,3 +45,9 @@ CREATE TRIGGER update_user_task_updated_on
         user_table
     FOR EACH ROW
 EXECUTE PROCEDURE update_updated_on_user_task();
+
+
+-- //Select all users
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_schema = 'public' AND table_name = 'staff_info';
