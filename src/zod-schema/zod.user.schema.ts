@@ -10,7 +10,7 @@ export const createUserSchema = object({
 
 export const googleSignupUserSchema = object({
     body: object({
-        name: string({ required_error: "Name is required" }).max(20, "Name must be less than 30 characters"),
+        name: string({ required_error: "Name is required" }).max(20, "Name must be less than 21 characters"),
         email: string({ required_error: 'Email is required' }).email()
     })
 });
@@ -31,7 +31,7 @@ export const emailUserSchema = object({
 
 export const editUserSchema = object({
     body: object({
-        name: string({ required_error: "Name is required" }).max(30, "Name must be less than 30 characters"),
+        name: string({ required_error: "Name is required" }).max(20, "Name must be less than 21 characters"),
     })
 });
 

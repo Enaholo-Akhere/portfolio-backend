@@ -12,7 +12,7 @@ const createUser = async (req: Request<{}, {}, userRegData>, res: Response) => {
     const body: userRegData = req.body
     const { pg_data, error } = await createUserService(body);
     if (error) {
-        return res.status(409).json({ error: error.message, status: 'failed' })
+        return res.status(409).json({ message: error.message, status: 'failed' })
     }
     const data = _.omit(pg_data?.rows[0], ['password']) as decodedData;
     await sendEmail(data);
