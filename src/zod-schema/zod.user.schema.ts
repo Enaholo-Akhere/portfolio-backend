@@ -2,7 +2,7 @@ import { string, object, TypeOf } from 'zod';
 
 export const createUserSchema = object({
     body: object({
-        name: string({ required_error: "Name is required" }).max(20, "must be less than 30 characters"),
+        name: string({ required_error: "Name is required" }).max(20, "Name must be less than 30 characters"),
         password: string({ required_error: "Password is required" }).min(6, 'Password too short'),
         email: string({ required_error: 'Email is required' }).max(80, 'email is too lengthy').email()
     })
@@ -10,7 +10,7 @@ export const createUserSchema = object({
 
 export const googleSignupUserSchema = object({
     body: object({
-        name: string({ required_error: "Name is required" }).max(20, "must be less than 30 characters"),
+        name: string({ required_error: "Name is required" }).max(20, "Name must be less than 30 characters"),
         email: string({ required_error: 'Email is required' }).email()
     })
 });
@@ -31,7 +31,7 @@ export const emailUserSchema = object({
 
 export const editUserSchema = object({
     body: object({
-        name: string({ required_error: "Name is required" }).max(30, "must be less than 30 characters"),
+        name: string({ required_error: "Name is required" }).max(30, "Name must be less than 30 characters"),
     })
 });
 
@@ -49,9 +49,7 @@ export const messageSchema = object({
 
 export const userIDSchema = object({
     params: object({
-        name: string({ required_error: "Name is required" }).max(30, "must be less than 30 characters"),
-        email: string({ required_error: 'Email is required' }).max(100, 'email is too lengthy').email(),
-        message: string({ required_error: 'Message is required' }).max(1000, "must be less than 30 characters"),
+        user_id: string({ required_error: 'user ID is required' }).max(1000, "must be less than 30 characters"),
     })
 });
 

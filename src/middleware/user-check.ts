@@ -15,8 +15,6 @@ const decode_jwt = async (req: Request, res: Response, next: NextFunction) => {
 
     if (!refreshToken) return res.status(400).json({ message: 'refreshed token not found' })
 
-
-
     const { expired, message, decoded } = await readJwt(token);
     const { expired: expRef, message: mesRef, decoded: decRef } = await readJwt(refreshToken);
 
@@ -41,7 +39,7 @@ const decode_jwt = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     if (!expired && !expRef) {
-        console.log('i got here line 44');
+        console.log('active 44');
         res.locals.user = decoded;
         return next();
     }

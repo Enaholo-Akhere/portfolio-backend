@@ -1,6 +1,10 @@
 import { decodedData, emailUrlAndName } from "../types/types.user";
+const url_dev = 'http://localhost:5600/api/v1/user';
+const url_prod = 'https://my-port-be.onrender.com/api/v1/user/';
 
 export const emailTemplate = ({ name, user_id, token }: decodedData) => {
+    const baseUrl = process.env.NODE_ENV === 'production' ? url_prod : url_dev;
+
     const email_temp = `<!DOCTYPE html>
 <html>
 <head>
@@ -19,7 +23,7 @@ export const emailTemplate = ({ name, user_id, token }: decodedData) => {
                 <p>Thank you for signing up with my service. I'am excited to have you here!</p>
                 <p>Your account has been successfully created. Please click the button below to confirm your email address:</p>
                 <p style="text-align: center; padding: 20px;">
-                    <a href="http:localhost:3000/${user_id}/${token}" style="background-color: #0073e6; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Confirm Email Address</a>
+                    <a href="${baseUrl}/verify/${user_id}/${token}" style="background-color: #0073e6; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Confirm Email Address</a>
                 </p>
                 <p>If you did not create this account, please ignore this email.</p>
                 <p>Thank you again for giving me a chance. If you have any questions or need assistance, please don't hesitate to contact me.</p>

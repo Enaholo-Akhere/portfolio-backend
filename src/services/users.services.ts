@@ -3,12 +3,12 @@ import { userRegData, userLogin, forgotPassword } from "../types/types.user";
 import hash_password from "../utils/hash-password";
 import pool from "../database/db";
 import { winston_logger } from "../utils/logger";
-import { REGISTER_USER, LOGIN_USER, EDIT_USER, REFRESH_TOKEN, DELETE_USER_ACCOUNT, GET_ALL_VISITORS, CHECK_EMAIL_EXIST, REQUEST_RESET_PASSWORD, CHECK_RESET_EMAIL_EXIST, UPDATE_RESET_PASSWORD, RESET_PASSWORD, DELETE_RESET_PASSWORD, SEND_MESSAGE } from '../database/queries'
+import { REGISTER_USER, LOGIN_USER, EDIT_USER, REFRESH_TOKEN, DELETE_USER_ACCOUNT, GET_ALL_VISITORS, CHECK_EMAIL_EXIST, REQUEST_RESET_PASSWORD, CHECK_RESET_EMAIL_EXIST, UPDATE_RESET_PASSWORD, RESET_PASSWORD, DELETE_RESET_PASSWORD, SEND_MESSAGE, VERIFIED_USER } from '../database/queries'
 import { checkEmailExist } from "../utils/check-email-exist";
 import comparePassword from "../utils/compare-password";
 import { customAlphabet } from 'nanoid';
 import config from 'config';
-import { writeJwt } from "../middleware/jwt-encryption";
+import { readJwt, writeJwt } from "../middleware/jwt-encryption";
 import _ from "lodash";
 import { sendForgotPasswordEmail, responseMessageEmail, sendMeAMessage } from "../utils/nodemailer";
 import generator from 'generate-password';
@@ -28,13 +28,14 @@ const createUserService = async (body: userRegData) => {
         if (error) throw new Error('could not hash the password')
         const password = new_password;
         const { name, email, } = body;
+        const isverified = false;
         const result = await checkEmailExist(email);
 
         if (result?.email_exist?.rows.length) {
             throw new Error('email already exist')
         }
 
-        const pg_data = await pool.query(REGISTER_USER, [password, email, name, user_id, token, refreshed_token]);
+        const pg_data = await pool.query(REGISTER_USER, [password, email, name, user_id, token, refreshed_token, isverified]);
 
         return { pg_data };
     }
@@ -67,7 +68,10 @@ const loginUserServices = async (loginDetails: userLogin) => {
         const result = await pool.query(LOGIN_USER, [email]);
 
         if (result?.rows.length) {
-            const { user_id, name, email: emailPG } = result.rows[0];
+            const { user_id, name, email: emailPG, isverified } = result.rows[0];
+
+            if (!isverified) throw new Error('Please Verify Your Email');
+
             const token = await writeJwt({ name, email: emailPG, user_id }, { expiresIn: config.get<string>('tokenTTL') });
             const refreshed_token = await writeJwt({ name, email: emailPG, user_id }, { expiresIn: config.get<string>('refreshedTokenTTL') });
 
@@ -107,10 +111,35 @@ const editUserService = async (decoded: decodedData, name: string) => {
     };
 };
 
+const verifyUserService = async (user_id: string, token: string) => {
+    const { expired, message, decoded } = await readJwt(token);
+    const { email } = decoded as decodedData;
+    const result = await pool.query(LOGIN_USER, [email]);
+    const { isverified: checkIsVerified } = await result.rows[0];
+
+    try {
+        if (expired) {
+            const { rowCount } = await pool.query(DELETE_USER_ACCOUNT, [user_id])
+            throw new Error('Link expired, please re-register')
+        };
+
+        if (checkIsVerified) throw new Error('User has been verified already');
+
+        const isverified = true;
+        const edited_user = await pool.query(VERIFIED_USER, [isverified, user_id])
+        const result = edited_user.rows[0]
+        return { result }
+    }
+    catch (error: any) {
+        winston_logger.error(error.message, error)
+        return { error };
+    };
+};
+
 
 const deleteUserAccountService = async (user_id: string) => {
     try {
-        if (!user_id) throw new Error('ID not valid')
+        if (!user_id) throw new Error('ID not valid');
 
         const { rowCount } = await pool.query(DELETE_USER_ACCOUNT, [user_id])
 
@@ -118,6 +147,8 @@ const deleteUserAccountService = async (user_id: string) => {
     }
     catch (error: any) {
         winston_logger.error(error.message, error);
+        console.log('error', error);
+
         return { error }
     }
 };
@@ -241,4 +272,4 @@ const messageMeService = async (messageMeService: messageMeInterface) => {
     }
 };
 
-export { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService, messageMeService }
+export { createUserService, loginUserServices, editUserService, deleteUserAccountService, getAllVisitorsService, forgotPasswordService, resetPasswordService, googleSignupService, logoutService, downloadResumeService, messageMeService, verifyUserService }
