@@ -2,7 +2,7 @@ import { string, object, TypeOf } from 'zod';
 
 export const createUserSchema = object({
     body: object({
-        name: string({ required_error: "Name is required" }).max(20, "Name must be less than 30 characters"),
+        name: string({ required_error: "Name is required" }).max(20, "Name must be less than 21 characters"),
         password: string({ required_error: "Password is required" }).min(6, 'Password too short'),
         email: string({ required_error: 'Email is required' }).max(80, 'email is too lengthy').email()
     })
