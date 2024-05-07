@@ -114,15 +114,16 @@ const editUserService = async (decoded: decodedData, name: string) => {
 const verifyUserService = async (user_id: string, token: string) => {
     const { expired, message, decoded } = await readJwt(token);
     const { email } = decoded as decodedData;
-    const result = await pool.query(LOGIN_USER, [email]);
-    const { isverified: checkIsVerified } = await result.rows[0];
 
     try {
+
         if (expired) {
             const { rowCount } = await pool.query(DELETE_USER_ACCOUNT, [user_id])
-            throw new Error('Link expired, please re-register')
+            throw new Error('Link Expired, Please Re-register')
         };
 
+        const results = await pool.query(LOGIN_USER, [email]);
+        const { isverified: checkIsVerified } = await results.rows[0];
         if (checkIsVerified) throw new Error('User has been verified already');
 
         const isverified = true;

@@ -17,7 +17,7 @@ router.post('/login', validate(loginUserSchema), loginUser);
 
 router.put('/edit/:userID', [decode_jwt, validate(editUserSchema)], editUserDetails);
 
-router.get('/verify/:userID/:token', verifyUser);
+router.put('/verify/:userID/:token', verifyUser);
 
 router.delete('/delete-user-account/:userID', [decode_jwt], deleteUserAccount);
 
