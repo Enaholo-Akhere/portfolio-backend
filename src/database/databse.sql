@@ -51,3 +51,5 @@ EXECUTE PROCEDURE update_updated_on_user_task();
 SELECT column_name, data_type
 FROM information_schema.columns
 WHERE table_schema = 'public' AND table_name = 'staff_info';
+
+ALTER TABLE user_table ADD isVerified BOOLEAN;
